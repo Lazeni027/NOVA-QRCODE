@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NovaQRCode - Générateur de QR Codes</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* En-tête */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Étapes */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: white;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .step-dot.done {
+            background: #2ecc71;
+        }
+
+        /* Cartes */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+
+        /* Sélecteur de style avec 3 options */
+        .style-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .style-card {
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .style-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .style-card.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .style-image {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .style-image svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .style-name {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .style-desc {
+            font-size: 0.75em;
+            color: #888;
+        }
+
+        /* Grille des modules */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .module-card {
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .module-card:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .module-card.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .module-emoji {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .module-name {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .module-card.selected .module-name {
+            color: white;
+        }
+
+        /* Formulaire */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .help-text {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Boutons */
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            font-size: 1.1em;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-nav {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            flex: 1;
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-next {
+            flex: 2;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: #5a6fd6;
+        }
+
+        .btn-generate {
+            background: #27ae60;
+            color: white;
+            font-size: 1.2em;
+            padding: 18px;
+        }
+
+        .btn-generate:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        /* QR Result */
+        .qr-result {
+            text-align: center;
+        }
+
+        .qr-box {
+            display: inline-block;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            margin: 20px 0;
+            border: 3px solid #e0e0e0;
+        }
+
+        .qr-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-download {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #219a52;
+        }
+
+        .btn-share {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-share:hover {
+            background: #2980b9;
+        }
+
+        .btn-redo {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-redo:hover {
+            background: #d35400;
+        }
+
+        /* Résumé */
+        .summary {
+            background: #f0f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .summary strong {
+            color: #667eea;
+        }
+
+        /* Pied de page */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 500px) {
+            .style-options {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .style-image {
+                height: 80px;
+            }
+            
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête -->
+        <div class="header">
+            <h1>📱 NovaQRCode</h1>
+            <p>Générez vos QR codes en 3 étapes</p>
+        </div>
+
+        <!-- Indicateur d'étapes -->
+        <div class="step-indicator">
+            <div class="step-dot active" id="dot1"></div>
+            <div class="step-dot" id="dot2"></div>
+            <div class="step-dot" id="dot3"></div>
+        </div>
+
+        <!-- ÉTAPE 1 : Choix du style -->
+        <div class="card active" id="step1">
+            <div class="card-title">
+                <span class="step-number">1</span>
+                Choisissez le style du QR Code
+            </div>
+            
+            <div class="style-options">
+                <!-- Style Carré -->
+                <div class="style-card selected" data-style="square" onclick="selectStyle('square', this)">
+                    <div class="style-image">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- QR Code style carré classique -->
+                            <rect x="5" y="5" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="30" y="5" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="75" y="5" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="5" y="30" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="50" y="30" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="75" y="30" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="5" y="55" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="30" y="55" width="20" height="20" fill="#fff" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                            <rect x="5" y="75" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="30" y="75" width="20" height="20" fill="#2c3e50" rx="2"/>
+                            <rect x="75" y="75" width="20" height="20" fill="#2c3e50" rx="2"/>
+                        </svg>
+                    </div>
+                    <div class="style-name">Classique</div>
+                    <div class="style-desc">Carrés</div>
+                </div>
+                
+                <!-- Style Barres Horizontales -->
+                <div class="style-card" data-style="bars-h" onclick="selectStyle('bars-h', this)">
+                    <div class="style-image">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- QR Code style barres horizontales -->
+                            <rect x="5" y="5" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="30" y="5" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="75" y="5" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="18" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="30" y="18" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="75" y="18" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="31" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="50" y="31" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="75" y="31" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="44" width="20" height="8" fill="#fff" stroke="#2c3e50" stroke-width="1" rx="1"/>
+                            <rect x="30" y="44" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="57" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="50" y="57" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="75" y="57" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="70" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="30" y="70" width="20" height="8" fill="#2c3e50" rx="1"/>
+                            <rect x="75" y="70" width="20" height="8" fill="#2c3e50" rx="1"/>
+                        </svg>
+                    </div>
+                    <div class="style-name">Barres H</div>
+                    <div class="style-desc">Horizontales</div>
+                </div>
+                
+                <!-- Style Barres Verticales -->
+                <div class="style-card" data-style="bars-v" onclick="selectStyle('bars-v', this)">
+                    <div class="style-image">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <!-- QR Code style barres verticales -->
+                            <rect x="5" y="5" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="18" y="5" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="87" y="5" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="30" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="31" y="30" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="87" y="30" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="55" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="44" y="55" width="8" height="20" fill="#fff" stroke="#2c3e50" stroke-width="1" rx="1"/>
+                            <rect x="87" y="55" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="5" y="75" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="18" y="75" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="87" y="75" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="57" y="5" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="70" y="5" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="57" y="75" width="8" height="20" fill="#2c3e50" rx="1"/>
+                            <rect x="70" y="75" width="8" height="20" fill="#2c3e50" rx="1"/>
+                        </svg>
+                    </div>
+                    <div class="style-name">Barres V</div>
+                    <div class="style-desc">Verticales</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-next" onclick="goToStep(2)" style="width:100%;margin-top:20px;">
+                Suivant : Choisir le type →
+            </button>
+        </div>
+
+        <!-- ÉTAPE 2 : Type de contenu -->
+        <div class="card" id="step2">
+            <div class="card-title">
+                <span class="step-number">2</span>
+                Que voulez-vous encoder ?
+            </div>
+            
+            <div class="module-grid">
+                <div class="module-card selected" data-module="text" onclick="selectModule('text', this)">
+                    <span class="module-emoji">💬</span>
+                    <span class="module-name">Texte simple</span>
+                </div>
+                <div class="module-card" data-module="url" onclick="selectModule('url', this)">
+                    <span class="module-emoji">🔗</span>
+                    <span class="module-name">Lien internet</span>
+                </div>
+                <div class="module-card" data-module="multilang" onclick="selectModule('multilang', this)">
+                    <span class="module-emoji">🌍</span>
+                    <span class="module-name">Texte multilingue</span>
+                </div>
+                <div class="module-card" data-module="contact" onclick="selectModule('contact', this)">
+                    <span class="module-emoji">👤</span>
+                    <span class="module-name">Carte de visite</span>
+                </div>
+                <div class="module-card" data-module="wifi" onclick="selectModule('wifi', this)">
+                    <span class="module-emoji">📶</span>
+                    <span class="module-name">Connexion WiFi</span>
+                </div>
+                <div class="module-card" data-module="email" onclick="selectModule('email', this)">
+                    <span class="module-emoji">✉️</span>
+                    <span class="module-name">Envoyer un email</span>
+                </div>
+            </div>
+            
+            <div class="btn-nav">
+                <button class="btn btn-back" onclick="goToStep(1)">← Retour</button>
+                <button class="btn btn-next" onclick="goToStep(3)">Suivant : Remplir →</button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 : Formulaire et génération -->
+        <div class="card" id="step3">
+            <div class="card-title">
+                <span class="step-number">3</span>
+                Remplissez les informations
+            </div>
+            
+            <div class="summary" id="summary"></div>
+            
+            <div id="inputSection"></div>
+            
+            <button class="btn btn-generate" onclick="generateQRCode()" style="width:100%;margin-top:20px;">
+                ✨ Générer le QR Code
+            </button>
+            
+            <div class="btn-nav">
+                <button class="btn btn-back" onclick="goToStep(2)">← Retour</button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4 : Résultat -->
+        <div class="card" id="step4">
+            <div class="card-title">
+                <span class="step-number">✓</span>
+                Votre QR Code est prêt !
+            </div>
+            
+            <div class="qr-result">
+                <div class="qr-box">
+                    <div id="qrcode"></div>
+                </div>
+                
+                <div class="qr-actions">
+                    <button class="btn btn-download" onclick="downloadQR()">
+                        💾 Télécharger
+                    </button>
+                    <button class="btn btn-share" onclick="shareQR()">
+                        📤 Partager
+                    </button>
+                </div>
+                
+                <button class="btn btn-redo" onclick="goToStep(1)" style="width:100%;margin-top:15px;">
+                    🔄 Créer un nouveau QR Code
+                </button>
+            </div>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            NovaQRCode - Générateur de QR codes gratuit
+        </div>
+    </div>
+
+    <script>
+        // État actuel
+        let currentStep = 1;
+        let currentStyle = 'square';
+        let currentModule = 'text';
+        let qrCode = null;
+
+        // Configuration des modules
+        const moduleConfigs = {
+            text: {
+                name: 'Texte simple',
+                emoji: '💬',
+                fields: [
+                    {
+                        type: 'textarea',
+                        name: 'message',
+                        label: 'Votre message',
+                        placeholder: 'Tapez le texte à encoder dans le QR code...',
+                        required: true,
+                        help: 'Ce texte s\'affichera quand quelqu\'un scannera le QR code'
+                    }
+                ]
+            },
+            url: {
+                name: 'Lien internet',
+                emoji: '🔗',
+                fields: [
+                    {
+                        type: 'url',
+                        name: 'url',
+                        label: 'Adresse du site web',
+                        placeholder: 'https://www.monsite.com',
+                        required: true,
+                        help: 'Le QR code ouvrira automatiquement cette adresse'
+                    },
+                    {
+                        type: 'text',
+                        name: 'title',
+                        label: 'Description (optionnel)',
+                        placeholder: 'Ex: Mon portfolio',
+                        help: 'Pour vous aider à identifier ce QR code'
+                    }
+                ]
+            },
+            multilang: {
+                name: 'Texte multilingue',
+                emoji: '🌍',
+                fields: [
+                    {
+                        type: 'textarea',
+                        name: 'message_fr',
+                        label: 'Texte en Français',
+                        placeholder: 'Bonjour, bienvenue !',
+                        required: true,
+                        help: 'Langue principale'
+                    },
+                    {
+                        type: 'textarea',
+                        name: 'message_en',
+                        label: 'Texte en Anglais',
+                        placeholder: 'Hello, welcome!',
+                        help: 'Traduction anglaise'
+                    },
+                    {
+                        type: 'textarea',
+                        name: 'message_es',
+                        label: 'Texte en Espagnol',
+                        placeholder: '¡Hola, bienvenido!',
+                        help: 'Traduction espagnole'
+                    }
+                ]
+            },
+            contact: {
+                name: 'Carte de visite',
+                emoji: '👤',
+                fields: [
+                    {
+                        type: 'text',
+                        name: 'name',
+                        label: 'Nom et prénom',
+                        placeholder: 'Jean Dupont',
+                        required: true,
+                        help: 'Sera ajouté dans les contacts'
+                    },
+                    {
+                        type: 'tel',
+                        name: 'phone',
+                        label: 'Téléphone',
+                        placeholder: '06 12 34 56 78',
+                        help: 'Numéro pour appeler'
+                    },
+                    {
+                        type: 'email',
+                        name: 'email',
+                        label: 'Email',
+                        placeholder: 'jean.dupont@email.com',
+                        help: 'Adresse email'
+                    }
+                ]
+            },
+            wifi: {
+                name: 'Connexion WiFi',
+                emoji: '📶',
+                fields: [
+                    {
+                        type: 'text',
+                        name: 'ssid',
+                        label: 'Nom du réseau WiFi',
+                        placeholder: 'MonWiFi',
+                        required: true,
+                        help: 'Le nom exact de votre réseau (SSID)'
+                    },
+                    {
+                        type: 'password',
+                        name: 'password',
+                        label: 'Mot de passe WiFi',
+                        placeholder: 'Mot de passe',
+                        help: 'Laissez vide si le WiFi est ouvert'
+                    },
+                    {
+                        type: 'select',
+                        name: 'encryption',
+                        label: 'Type de sécurité',
+                        options: ['WPA/WPA2', 'WEP', 'Pas de mot de passe'],
+                        help: 'Le type de protection de votre WiFi'
+                    }
+                ]
+            },
+            email: {
+                name: 'Envoyer un email',
+                emoji: '✉️',
+                fields: [
+                    {
+                        type: 'email',
+                        name: 'to',
+                        label: 'Adresse du destinataire',
+                        placeholder: 'contact@exemple.com',
+                        required: true,
+                        help: 'À qui envoyer l\'email'
+                    },
+                    {
+                        type: 'text',
+                        name: 'subject',
+                        label: 'Sujet du message',
+                        placeholder: 'Objet de l\'email',
+                        help: 'Sujet pré-rempli'
+                    },
+                    {
+                        type: 'textarea',
+                        name: 'body',
+                        label: 'Contenu du message',
+                        placeholder: 'Bonjour,...',
+                        help: 'Message pré-écrit'
+                    }
+                ]
+            }
+        };
+
+        // Navigation entre les étapes
+        function goToStep(step) {
+            document.querySelectorAll('.card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            
+            var targetCard = document.getElementById('step' + step);
+            if (targetCard) {
+                targetCard.classList.add('active');
+                currentStep = step;
+                
+                if (step === 3) {
+                    renderForm();
+                    updateSummary();
+                }
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            updateStepDots();
+        }
+
+        function updateStepDots() {
+            for (var i = 1; i <= 3; i++) {
+                var dot = document.getElementById('dot' + i);
+                dot.classList.remove('active', 'done');
+                
+                if (i < currentStep) {
+                    dot.classList.add('done');
+                } else if (i === currentStep && currentStep <= 3) {
+                    dot.classList.add('active');
+                }
+            }
+        }
+
+        // Sélection du style
+        function selectStyle(style, element) {
+            currentStyle = style;
+            document.querySelectorAll('.style-card').forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // Sélection du module
+        function selectModule(module, element) {
+            currentModule = module;
+            document.querySelectorAll('.module-card').forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // Afficher le formulaire
+        function renderForm() {
+            var config = moduleConfigs[currentModule];
+            var html = '';
+            
+            config.fields.forEach(function(field) {
+                html += '<div class="form-group">';
+                html += '<label class="' + (field.required ? 'required' : '') + '">' + field.label + '</label>';
+                
+                if (field.type === 'textarea') {
+                    html += '<textarea name="' + field.name + '" placeholder="' + field.placeholder + '" ' + (field.required ? 'required' : '') + '></textarea>';
+                } else if (field.type === 'select') {
+                    html += '<select name="' + field.name + '">';
+                    field.options.forEach(function(option) {
+                        html += '<option value="' + option + '">' + option + '</option>';
+                    });
+                    html += '</select>';
+                } else {
+                    html += '<input type="' + field.type + '" name="' + field.name + '" placeholder="' + field.placeholder + '" ' + (field.required ? 'required' : '') + '>';
+                }
+                
+                if (field.help) {
+                    html += '<div class="help-text">' + field.help + '</div>';
+                }
+                
+                html += '</div>';
+            });
+            
+            document.getElementById('inputSection').innerHTML = html;
+        }
+
+        // Mettre à jour le résumé
+        function updateSummary() {
+            var config = moduleConfigs[currentModule];
+            var styleNames = {
+                'square': 'Classique (carrés)',
+                'bars-h': 'Barres horizontales',
+                'bars-v': 'Barres verticales'
+            };
+            
+            document.getElementById('summary').innerHTML = 
+                '<strong>Style :</strong> ' + styleNames[currentStyle] + ' | ' +
+                '<strong>Type :</strong> ' + config.emoji + ' ' + config.name;
+        }
+
+        // Récupérer le contenu à encoder
+        function getContent() {
+            var formData = {};
+            var inputs = document.querySelectorAll('#inputSection input, #inputSection textarea, #inputSection select');
+            
+            inputs.forEach(function(input) {
+                if (input.name) {
+                    formData[input.name] = input.value;
+                }
+            });
+
+            switch(currentModule) {
+                case 'text':
+                    return formData.message || '';
+                
+                case 'url':
+                    return formData.url || '';
+                
+                case 'multilang':
+                    var text = '';
+                    if (formData.message_fr) text += '🇫🇷 ' + formData.message_fr + '\n\n';
+                    if (formData.message_en) text += '🇬🇧 ' + formData.message_en + '\n\n';
+                    if (formData.message_es) text += '🇪🇸 ' + formData.message_es;
+                    return text.trim();
+                
+                case 'contact':
+                    var vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
+                    if (formData.name) vcard += 'FN:' + formData.name + '\n';
+                    if (formData.phone) vcard += 'TEL:' + formData.phone + '\n';
+                    if (formData.email) vcard += 'EMAIL:' + formData.email + '\n';
+                    vcard += 'END:VCARD';
+                    return vcard;
+                
+                case 'wifi':
+                    var encryption = 'WPA';
+                    if (formData.encryption === 'WEP') encryption = 'WEP';
+                    if (formData.encryption === 'Pas de mot de passe') encryption = 'nopass';
+                    return 'WIFI:T:' + encryption + ';S:' + formData.ssid + ';P:' + (formData.password || '') + ';;';
+                
+                case 'email':
+                    var mailto = 'mailto:' + formData.to;
+                    var params = [];
+                    if (formData.subject) params.push('subject=' + encodeURIComponent(formData.subject));
+                    if (formData.body) params.push('body=' + encodeURIComponent(formData.body));
+                    if (params.length > 0) mailto += '?' + params.join('&');
+                    return mailto;
+                
+                default:
+                    return '';
+            }
+        }
+
+        // Générer le QR code
+        function generateQRCode() {
+            var content = getContent();
+            
+            if (!content || content.trim() === '') {
+                alert('Veuillez remplir au moins les champs obligatoires (marqués d\'une *).');
+                return;
+            }
+
+            goToStep(4);
+            
+            document.getElementById('qrcode').innerHTML = '';
+            
+            try {
+                qrCode = new QRCode(document.getElementById('qrcode'), {
+                    text: content,
+                    width: 300,
+                    height: 300,
+                    colorDark: '#2c3e50',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Appliquer le style selon le choix
+                if (currentStyle === 'bars-h') {
+                    setTimeout(applyHorizontalBars, 300);
+                } else if (currentStyle === 'bars-v') {
+                    setTimeout(applyVerticalBars, 300);
+                }
+                
+            } catch (error) {
+                alert('Une erreur est survenue. Veuillez réessayer.');
+                console.error(error);
+            }
+        }
+
+        // Appliquer le style barres horizontales
+        function applyHorizontalBars() {
+            var canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+            
+            var ctx = canvas.getContext('2d');
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var data = imageData.data;
+            var blockSize = Math.floor(canvas.width / 25);
+            
+            for (var y = 0; y < canvas.height; y += blockSize) {
+                for (var x = 0; x < canvas.width; x += blockSize) {
+                    var idx = (y * canvas.width + x) * 4;
+                    
+                    if (data[idx] < 128) {
+                        // Dessiner barre horizontale
+                        for (var dy = Math.floor(blockSize * 0.25); dy < blockSize * 0.75 && (y + dy) < canvas.height; dy++) {
+                            for (var dx = 0; dx < blockSize && (x + dx) < canvas.width; dx++) {
+                                var barIdx = ((y + dy) * canvas.width + (x + dx)) * 4;
+                                data[barIdx] = 0;
+                                data[barIdx + 1] = 0;
+                                data[barIdx + 2] = 0;
+                                data[barIdx + 3] = 255;
+                            }
+                        }
+                        
+                        // Effacer au-dessus et en-dessous
+                        for (var dy2 = 0; dy2 < Math.floor(blockSize * 0.25) && (y + dy2) < canvas.height; dy2++) {
+                            for (var dx2 = 0; dx2 < blockSize && (x + dx2) < canvas.width; dx2++) {
+                                var clearIdx = ((y + dy2) * canvas.width + (x + dx2)) * 4;
+                                data[clearIdx] = 255;
+                                data[clearIdx + 1] = 255;
+                                data[clearIdx + 2] = 255;
+                                data[clearIdx + 3] = 255;
+                            }
+                        }
+                        for (var dy3 = Math.floor(blockSize * 0.75); dy3 < blockSize && (y + dy3) < canvas.height; dy3++) {
+                            for (var dx3 = 0; dx3 < blockSize && (x + dx3) < canvas.width; dx3++) {
+                                var clearIdx2 = ((y + dy3) * canvas.width + (x + dx3)) * 4;
+                                data[clearIdx2] = 255;
+                                data[clearIdx2 + 1] = 255;
+                                data[clearIdx2 + 2] = 255;
+                                data[clearIdx2 + 3] = 255;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Appliquer le style barres verticales
+        function applyVerticalBars() {
+            var canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+            
+            var ctx = canvas.getContext('2d');
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var data = imageData.data;
+            var blockSize = Math.floor(canvas.width / 25);
+            
+            for (var y = 0; y < canvas.height; y += blockSize) {
+                for (var x = 0; x < canvas.width; x += blockSize) {
+                    var idx = (y * canvas.width + x) * 4;
+                    
+                    if (data[idx] < 128) {
+                        // Dessiner barre verticale
+                        for (var dx = Math.floor(blockSize * 0.25); dx < blockSize * 0.75 && (x + dx) < canvas.width; dx++) {
+                            for (var dy = 0; dy < blockSize && (y + dy) < canvas.height; dy++) {
+                                var barIdx = ((y + dy) * canvas.width + (x + dx)) * 4;
+                                data[barIdx] = 0;
+                                data[barIdx + 1] = 0;
+                                data[barIdx + 2] = 0;
+                                data[barIdx + 3] = 255;
+                            }
+                        }
+                        
+                        // Effacer à gauche et à droite
+                        for (var dx2 = 0; dx2 < Math.floor(blockSize * 0.25) && (x + dx2) < canvas.width; dx2++) {
+                            for (var dy2 = 0; dy2 < blockSize && (y + dy2) < canvas.height; dy2++) {
+                                var clearIdx = ((y + dy2) * canvas.width + (x + dx2)) * 4;
+                                data[clearIdx] = 255;
+                                data[clearIdx + 1] = 255;
+                                data[clearIdx + 2] = 255;
+                                data[clearIdx + 3] = 255;
+                            }
+                        }
+                        for (var dx3 = Math.floor(blockSize * 0.75); dx3 < blockSize && (x + dx3) < canvas.width; dx3++) {
+                            for (var dy3 = 0; dy3 < blockSize && (y + dy3) < canvas.height; dy3++) {
+                                var clearIdx2 = ((y + dy3) * canvas.width + (x + dx3)) * 4;
+                                data[clearIdx2] = 255;
+                                data[clearIdx2 + 1] = 255;
+                                data[clearIdx2 + 2] = 255;
+                                data[clearIdx2 + 3] = 255;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Télécharger
+        function downloadQR() {
+            if (!qrCode) return;
+            
+            var canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                var styleName = currentStyle === 'square' ? 'classique' : (currentStyle === 'bars-h' ? 'barres_h' : 'barres_v');
+                link.download = 'qrcode_' + styleName + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Partager
+        function shareQR() {
+            if (!qrCode) return;
+            
+            var canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+
+            canvas.toBlob(function(blob) {
+                if (navigator.share) {
+                    var file = new File([blob], 'qrcode.png', { type: 'image/png' });
+                    navigator.share({
+                        title: 'QR Code NovaQRCode',
+                        files: [file]
+                    }).catch(function() {});
+                } else {
+                    var url = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'qrcode_nova.png';
+                    link.click();
+                    URL.revokeObjectURL(url);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
