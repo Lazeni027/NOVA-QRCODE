@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code · Assistant pas à pas</title>
+    <title>QR Code · Assistant malin</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -16,16 +16,16 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f4f7fc;
+            background: #f2f6fe;
             min-height: 100vh;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .app-wrapper {
-            max-width: 1100px;
+            max-width: 880px;
             width: 100%;
             margin: 0 auto;
         }
@@ -33,112 +33,177 @@
         /* --- CARTE PRINCIPALE --- */
         .card {
             background: #ffffff;
-            border-radius: 32px;
+            border-radius: 40px;
             padding: 2rem 2.2rem 2.5rem;
-            box-shadow: 0 24px 48px -12px rgba(0, 20, 40, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 48px -12px rgba(0, 20, 40, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: box-shadow 0.3s ease;
         }
 
+        .card:hover {
+            box-shadow: 0 28px 56px -16px rgba(0, 20, 40, 0.18);
+        }
+
+        /* --- EN-TÊTE --- */
         .card-header {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 2rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid #f0f4fe;
+            margin-bottom: 1.5rem;
         }
 
-        .card-header i {
-            font-size: 1.6rem;
-            color: #1d3a5c;
+        .card-header .icon-robot {
+            background: linear-gradient(135deg, #1d3a5c, #2a5a7a);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(29, 58, 92, 0.2);
         }
 
         .card-header h1 {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 600;
+            color: #0b1e33;
             letter-spacing: -0.02em;
+        }
+
+        .card-header .ia-badge {
+            margin-left: auto;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* --- BULLE DE L'ASSISTANT (communication améliorée) --- */
+        .assistant-bubble {
+            background: #f0f7ff;
+            border-radius: 20px 20px 20px 6px;
+            padding: 0.9rem 1.5rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            border: 1px solid #e2edfc;
+            transition: all 0.3s ease;
+            min-height: 60px;
+        }
+
+        .assistant-bubble .avatar {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .assistant-bubble .message-content {
+            font-size: 0.95rem;
+            color: #1f3a5f;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .assistant-bubble .message-content strong {
             color: #0b1e33;
         }
 
-        .step-badge {
-            margin-left: auto;
-            background: #eef3fa;
-            color: #1d3a5c;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.3rem 1rem;
+        .assistant-bubble .message-content .highlight {
+            background: #dbeafe;
+            padding: 0.1rem 0.6rem;
             border-radius: 40px;
-            border: 1px solid #d9e2ef;
+            font-weight: 600;
+            color: #1d4ed8;
         }
 
-        /* --- ÉTAPES (stepper) --- */
+        /* --- STEPPER --- */
         .stepper {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.2rem;
+            margin-bottom: 2rem;
             position: relative;
+            padding: 0 0.5rem;
         }
 
         .stepper::before {
             content: '';
             position: absolute;
             top: 50%;
-            left: 0;
-            right: 0;
+            left: 2rem;
+            right: 2rem;
             height: 3px;
             background: #e2eaf5;
             transform: translateY(-50%);
             z-index: 0;
+            border-radius: 4px;
         }
 
         .step-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.3rem;
             z-index: 1;
-            background: #f4f7fc;
-            padding: 0 0.6rem;
-            cursor: pointer;
-            transition: 0.2s;
-            border: none;
             background: transparent;
+            padding: 0 0.5rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.25s ease;
+            flex: 1;
         }
 
         .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 40px;
+            width: 44px;
+            height: 44px;
+            border-radius: 44px;
             background: #e2eaf5;
-            color: #4a6f9e;
+            color: #8aa0bc;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
-            transition: 0.2s;
+            font-size: 1rem;
+            transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 3px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
         .step-item.active .step-circle {
             background: #1d3a5c;
             color: white;
             border-color: #b6d0e8;
-            box-shadow: 0 4px 12px rgba(29, 58, 92, 0.25);
+            box-shadow: 0 4px 16px rgba(29, 58, 92, 0.25);
+            transform: scale(1.05);
         }
 
         .step-item.done .step-circle {
-            background: #2b7a4b;
+            background: #1f6d4a;
             color: white;
+            border-color: #b8d9c9;
+        }
+
+        .step-item.done .step-circle i {
+            font-size: 1.1rem;
         }
 
         .step-label {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: 600;
-            color: #6f8fb0;
+            color: #8aa0bc;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
+            text-align: center;
+            transition: color 0.3s;
         }
 
         .step-item.active .step-label {
@@ -146,21 +211,21 @@
         }
 
         .step-item.done .step-label {
-            color: #2b7a4b;
+            color: #1f6d4a;
         }
 
-        /* --- ÉTAPES CONTENU --- */
+        /* --- PANNEAUX --- */
         .step-panel {
             display: none;
-            animation: fadeUp 0.3s ease;
+            animation: slideFade 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .step-panel.active {
             display: block;
         }
 
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(12px); }
+        @keyframes slideFade {
+            0% { opacity: 0; transform: translateY(16px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
@@ -177,26 +242,22 @@
         .step-title i {
             color: #1d3a5c;
             font-size: 1.2rem;
+            background: #eef3fa;
+            padding: 0.4rem;
+            border-radius: 12px;
         }
 
         /* --- FORMULAIRES --- */
         .form-group {
-            margin-bottom: 1.4rem;
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            display: block;
             font-weight: 500;
             font-size: 0.85rem;
             color: #1f3a5f;
-            margin-bottom: 0.4rem;
-        }
-
-        .form-group label i {
-            width: 1.4rem;
-            color: #4a6f9e;
+            margin-bottom: 0.3rem;
         }
 
         textarea,
@@ -206,10 +267,10 @@
             width: 100%;
             padding: 0.7rem 1rem;
             border: 1.5px solid #e2eaf5;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 0.95rem;
             background: #fafcff;
-            transition: 0.15s;
+            transition: 0.2s ease;
             font-family: inherit;
             color: #0b1e33;
         }
@@ -241,13 +302,18 @@
         }
 
         .color-picker-group input[type="color"] {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             padding: 3px;
             border: 1.5px solid #d9e2ef;
-            border-radius: 14px;
+            border-radius: 16px;
             cursor: pointer;
             background: white;
+            transition: 0.2s;
+        }
+
+        .color-picker-group input[type="color"]:hover {
+            border-color: #3f6b9e;
         }
 
         .color-label {
@@ -259,9 +325,9 @@
         .file-upload-area {
             border: 1.5px dashed #cbd8ea;
             border-radius: 16px;
-            padding: 0.9rem 1.2rem;
+            padding: 0.8rem 1.2rem;
             background: #f8faff;
-            transition: 0.2s;
+            transition: 0.25s ease;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -272,10 +338,11 @@
         .file-upload-area:hover {
             border-color: #3f6b9e;
             background: #f2f8ff;
+            transform: translateY(-1px);
         }
 
         .file-upload-area i {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: #3f6b9e;
         }
 
@@ -287,13 +354,14 @@
             display: none;
             align-items: center;
             gap: 0.8rem;
-            margin-top: 0.7rem;
+            margin-top: 0.6rem;
             flex-wrap: wrap;
+            animation: slideFade 0.3s ease;
         }
 
         #logoPreview img {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             object-fit: cover;
             border-radius: 14px;
             border: 1px solid #d9e2ef;
@@ -302,13 +370,13 @@
         .remove-logo-btn {
             background: #f1f5fa;
             border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 30px;
-            font-size: 1rem;
+            width: 28px;
+            height: 28px;
+            border-radius: 28px;
+            font-size: 0.9rem;
             color: #7b5a5a;
             cursor: pointer;
-            transition: 0.15s;
+            transition: 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -317,6 +385,7 @@
         .remove-logo-btn:hover {
             background: #fee8e8;
             color: #b91c1c;
+            transform: scale(1.1);
         }
 
         .char-counter {
@@ -325,9 +394,6 @@
             color: #8aa0bc;
             margin-top: 0.2rem;
         }
-
-        .char-counter.warning { color: #b68b2c; }
-        .char-counter.danger { color: #b13e3e; }
 
         /* --- BOUTONS --- */
         .btn {
@@ -338,23 +404,24 @@
             background: #1d3a5c;
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 40px;
+            padding: 0.85rem 2rem;
+            border-radius: 60px;
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 8px -4px rgba(29, 58, 92, 0.2);
+            transition: 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 4px 12px -4px rgba(29, 58, 92, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            min-width: 130px;
         }
 
-        .btn i { font-size: 1rem; }
+        .btn i { font-size: 1.1rem; }
         .btn:hover {
             background: #264b73;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -8px rgba(29, 58, 92, 0.3);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 10px 24px -8px rgba(29, 58, 92, 0.3);
         }
-        .btn:active { transform: translateY(0); }
+        .btn:active { transform: translateY(0) scale(0.98); }
 
         .btn-secondary {
             background: #eef3fa;
@@ -364,11 +431,12 @@
         }
         .btn-secondary:hover {
             background: #e2eaf5;
-            box-shadow: 0 4px 8px -4px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 12px -4px rgba(0,0,0,0.06);
         }
 
         .btn-success {
             background: #1f6d4a;
+            box-shadow: 0 4px 12px -4px rgba(31, 109, 74, 0.3);
         }
         .btn-success:hover {
             background: #2a825a;
@@ -386,8 +454,7 @@
             flex-wrap: wrap;
             margin-top: 0.5rem;
         }
-
-        .btn-group .btn { flex: 1; min-width: 100px; }
+        .btn-group .btn { flex: 1; min-width: 110px; }
 
         .action-bar {
             display: flex;
@@ -400,6 +467,10 @@
             padding-top: 1.5rem;
         }
 
+        .action-bar .btn {
+            min-width: 110px;
+        }
+
         /* --- APERÇU QR --- */
         .qr-preview-area {
             display: flex;
@@ -410,7 +481,11 @@
             border-radius: 24px;
             padding: 1.5rem;
             border: 1px solid #e8eff8;
-            margin-top: 0.5rem;
+            transition: border-color 0.3s;
+        }
+
+        .qr-preview-area:hover {
+            border-color: #d0dcee;
         }
 
         .qr-container {
@@ -418,10 +493,15 @@
             padding: 1rem;
             border-radius: 20px;
             box-shadow: 0 8px 20px -8px rgba(0,0,0,0.04);
-            max-width: 280px;
+            max-width: 260px;
             width: 100%;
             display: flex;
             justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .qr-container:hover {
+            transform: scale(1.02);
         }
 
         #qrImage {
@@ -429,6 +509,7 @@
             height: auto;
             border-radius: 12px;
             display: block;
+            transition: opacity 0.3s;
         }
 
         .loader {
@@ -452,17 +533,17 @@
         .preview-info {
             background: white;
             border-radius: 16px;
-            padding: 0.8rem 1.2rem;
+            padding: 0.6rem 1.2rem;
             width: 100%;
             border: 1px solid #e8eff8;
             font-size: 0.8rem;
-            line-height: 1.6;
+            line-height: 1.8;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.2rem 1rem;
+            gap: 0.1rem 1rem;
         }
         .preview-info .label { font-weight: 600; color: #1d3a5c; }
-        .preview-info span:last-child { color: #0b1e33; text-align: right; }
+        .preview-info span:last-child { color: #0b1e33; text-align: right; word-break: break-word; }
 
         /* --- TOAST / ALERT --- */
         .toast {
@@ -501,18 +582,20 @@
         .alert-error { background: #fce8e8; color: #8b2c2c; border: 1px solid #f3cfcf; display: block; }
 
         /* --- RESPONSIVE --- */
-        @media (max-width: 720px) {
-            .card { padding: 1.5rem; }
+        @media (max-width: 640px) {
+            .card { padding: 1.2rem; border-radius: 28px; }
             .form-row { grid-template-columns: 1fr; }
-            .step-label { font-size: 0.6rem; }
-            .step-circle { width: 34px; height: 34px; font-size: 0.8rem; }
-            .stepper { gap: 0.2rem; }
+            .stepper { gap: 0; padding: 0; }
+            .step-label { font-size: 0.5rem; }
+            .step-circle { width: 36px; height: 36px; font-size: 0.8rem; }
             .action-bar { flex-direction: column; align-items: stretch; }
+            .action-bar .btn { width: 100%; }
+            .btn-group .btn { min-width: 70px; }
             .preview-info { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 480px) {
-            body { padding: 1rem; }
+            .assistant-bubble { font-size: 0.85rem; padding: 0.8rem 1rem; }
             .card-header h1 { font-size: 1.2rem; }
+            .card-header .ia-badge { font-size: 0.6rem; padding: 0.2rem 0.8rem; }
+            .card-header .icon-robot { width: 40px; height: 40px; font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -520,11 +603,20 @@
 
 <div class="app-wrapper">
     <div class="card">
+
         <!-- En-tête -->
         <div class="card-header">
-            <i class="fas fa-qrcode"></i>
-            <h1>Assistant QR Code</h1>
-            <span class="step-badge" id="stepBadge">Étape 1 / 3</span>
+            <div class="icon-robot"><i class="fas fa-robot"></i></div>
+            <h1>Mon QR Code</h1>
+            <span class="ia-badge"><i class="fas fa-sparkles"></i> Assistant</span>
+        </div>
+
+        <!-- Bulle de l'assistant -->
+        <div class="assistant-bubble" id="assistantBubble">
+            <div class="avatar">🤖</div>
+            <div class="message-content" id="assistantMessage">
+                <strong>Prêt ?</strong> <span id="assistantText">Donnez-moi le texte ou le lien à encoder.</span>
+            </div>
         </div>
 
         <!-- Stepper -->
@@ -538,25 +630,26 @@
                 <span class="step-label">Style</span>
             </button>
             <button class="step-item" data-step="3" type="button">
-                <span class="step-circle">3</span>
-                <span class="step-label">Télécharger</span>
+                <span class="step-circle"><i class="fas fa-download"></i></span>
+                <span class="step-label">Finaliser</span>
             </button>
         </div>
 
         <!-- Alertes -->
         <div id="alert" class="alert"></div>
 
-        <!-- ===== ÉTAPE 1 : CONTENU ===== -->
+        <!-- ===== ÉTAPE 1 ===== -->
         <div class="step-panel active" id="step1">
-            <div class="step-title"><i class="fas fa-pen-fancy"></i> Que voulez-vous encoder ?</div>
+            <div class="step-title"><i class="fas fa-pen-fancy"></i> Étape 1 · Contenu</div>
+
             <div class="form-group">
-                <label for="qrData"><i class="fas fa-database"></i> Données (texte, URL, email, etc.)</label>
-                <textarea id="qrData" placeholder="Ex: https://mon-site.com, texte libre, numéro..." required>https://exemple.com</textarea>
+                <label for="qrData">📝 Que voulez-vous encoder ?</label>
+                <textarea id="qrData" placeholder="Ex: https://mon-site.com, un texte, un numéro..." required></textarea>
                 <div class="char-counter" id="charCounter">0 caractères</div>
             </div>
 
             <div class="form-group">
-                <label for="dataType"><i class="fas fa-tag"></i> Type (indice)</label>
+                <label for="dataType">🏷️ Type (pour m'aider)</label>
                 <select id="dataType">
                     <option value="text">📄 Texte libre</option>
                     <option value="url" selected>🔗 Lien / URL</option>
@@ -568,25 +661,25 @@
             </div>
 
             <div class="action-bar">
-                <span></span>
-                <button class="btn" id="toStep2"><i class="fas fa-arrow-right"></i> Configurer le style</button>
+                <span style="font-size: 0.8rem; color: #8aa0bc;"><i class="fas fa-arrow-right"></i> Étape suivante</span>
+                <button class="btn" id="toStep2"><i class="fas fa-arrow-right"></i> Personnaliser</button>
             </div>
         </div>
 
-        <!-- ===== ÉTAPE 2 : STYLE ===== -->
+        <!-- ===== ÉTAPE 2 ===== -->
         <div class="step-panel" id="step2">
-            <div class="step-title"><i class="fas fa-sliders-h"></i> Personnalisation</div>
+            <div class="step-title"><i class="fas fa-sliders-h"></i> Étape 2 · Style</div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><i class="fas fa-palette"></i> Fond</label>
+                    <label>Couleur de fond</label>
                     <div class="color-picker-group">
                         <input type="color" id="bgColor" value="#ffffff">
                         <span class="color-label">Blanc</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-palette"></i> QR</label>
+                    <label>Couleur du QR</label>
                     <div class="color-picker-group">
                         <input type="color" id="fillColor" value="#1d3a5c">
                         <span class="color-label">Bleu foncé</span>
@@ -596,43 +689,28 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="boxSize"><i class="fas fa-vector-square"></i> Taille module</label>
+                    <label for="boxSize">📏 Taille des carreaux</label>
                     <input type="number" id="boxSize" value="10" min="2" max="18">
                 </div>
                 <div class="form-group">
-                    <label for="borderSize"><i class="fas fa-border-all"></i> Bordure</label>
+                    <label for="borderSize">🖼️ Bordure (espace blanc)</label>
                     <input type="number" id="borderSize" value="4" min="0" max="10">
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="errorCorrection"><i class="fas fa-shield-alt"></i> Correction</label>
-                    <select id="errorCorrection">
-                        <option value="L">L (7%)</option>
-                        <option value="M">M (15%)</option>
-                        <option value="Q">Q (25%)</option>
-                        <option value="H" selected>H (30%)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="qrVersion"><i class="fas fa-layer-group"></i> Version</label>
-                    <select id="qrVersion">
-                        <option value="auto">Auto</option>
-                        <option value="1">1 (21x21)</option>
-                        <option value="2">2 (25x25)</option>
-                        <option value="3">3 (29x29)</option>
-                        <option value="5">5 (37x37)</option>
-                        <option value="10">10 (57x57)</option>
-                        <option value="20">20 (101x101)</option>
-                        <option value="40">40 (177x177)</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="errorCorrection">🛡️ Niveau de correction</label>
+                <select id="errorCorrection">
+                    <option value="L">L – Faible (7%)</option>
+                    <option value="M">M – Moyen (15%)</option>
+                    <option value="Q">Q – Élevé (25%)</option>
+                    <option value="H" selected>H – Maximum (30%)</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="textOverlay"><i class="fas fa-font"></i> Texte additionnel</label>
-                <input type="text" id="textOverlay" placeholder="Optionnel">
+                <label for="textOverlay">✏️ Texte supplémentaire (optionnel)</label>
+                <input type="text" id="textOverlay" placeholder="Ex: « Scannez-moi ! »">
             </div>
 
             <div class="form-group">
@@ -648,51 +726,39 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="styleSelect"><i class="fas fa-magic"></i> Style prédéfini</label>
-                <select id="styleSelect">
-                    <option value="classic">Classique</option>
-                    <option value="minimal">Minimal</option>
-                    <option value="rounded">Coins arrondis</option>
-                    <option value="gradient">Dégradé</option>
-                </select>
-            </div>
-
             <div class="action-bar">
                 <button class="btn btn-secondary" id="toStep1"><i class="fas fa-arrow-left"></i> Retour</button>
-                <button class="btn" id="generateAndGoStep3"><i class="fas fa-qrcode"></i> Générer &amp; télécharger</button>
+                <button class="btn" id="generateAndGoStep3"><i class="fas fa-qrcode"></i> Voir mon QR</button>
             </div>
         </div>
 
-        <!-- ===== ÉTAPE 3 : TÉLÉCHARGER ===== -->
+        <!-- ===== ÉTAPE 3 ===== -->
         <div class="step-panel" id="step3">
-            <div class="step-title"><i class="fas fa-download"></i> Télécharger votre QR Code</div>
+            <div class="step-title"><i class="fas fa-download"></i> Étape 3 · Télécharger</div>
 
-            <!-- Aperçu -->
             <div class="qr-preview-area">
                 <div class="qr-container">
                     <img id="qrImage" src="" alt="QR Code">
                 </div>
                 <div class="loader" id="loader">
                     <div class="spinner"></div>
-                    <p style="margin-top: 0.5rem; color: #4a6f9e; font-size: 0.85rem;">Génération…</p>
+                    <p style="margin-top: 0.5rem; color: #4a6f9e; font-size: 0.85rem;">Génération en cours…</p>
                 </div>
 
                 <div class="preview-info">
-                    <span class="label">Données</span> <span id="previewData">—</span>
-                    <span class="label">Taille</span> <span id="previewSize">—</span>
-                    <span class="label">Version</span> <span id="previewVersion">—</span>
-                    <span class="label">Correction</span> <span id="previewCorrection">—</span>
+                    <span class="label">📦 Données</span> <span id="previewData">—</span>
+                    <span class="label">📐 Taille</span> <span id="previewSize">—</span>
+                    <span class="label">🛡️ Correction</span> <span id="previewCorrection">—</span>
                 </div>
 
                 <div class="btn-group" style="width:100%;">
-                    <button class="btn btn-success" id="downloadBtn"><i class="fas fa-download"></i> Télécharger PNG</button>
-                    <button class="btn btn-secondary" id="copyBtn"><i class="fas fa-copy"></i> Copier base64</button>
+                    <button class="btn btn-success" id="downloadBtn"><i class="fas fa-download"></i> Télécharger</button>
+                    <button class="btn btn-secondary" id="copyBtn"><i class="fas fa-copy"></i> Copier</button>
                 </div>
             </div>
 
             <div class="action-bar">
-                <button class="btn btn-secondary" id="toStep2"><i class="fas fa-arrow-left"></i> Modifier le style</button>
+                <button class="btn btn-secondary" id="toStep2"><i class="fas fa-arrow-left"></i> Modifier</button>
                 <button class="btn" id="regenerateBtn"><i class="fas fa-redo"></i> Régénérer</button>
             </div>
         </div>
@@ -707,34 +773,23 @@
     (function() {
         "use strict";
 
-        // --- ÉLÉMENTS ---
+        // --- DOM ---
         const steps = document.querySelectorAll('.step-item');
-        const panels = {
-            1: document.getElementById('step1'),
-            2: document.getElementById('step2'),
-            3: document.getElementById('step3')
-        };
-        const stepBadge = document.getElementById('stepBadge');
+        const panels = { 1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3') };
+        const assistantText = document.getElementById('assistantText');
 
-        // Boutons navigation
         const toStep1 = document.getElementById('toStep1');
         const toStep2 = document.getElementById('toStep2');
-        const toStep2From1 = document.getElementById('toStep2');
         const generateAndGoStep3 = document.getElementById('generateAndGoStep3');
-        const toStep2Back = document.getElementById('toStep2'); // déjà
         const regenerateBtn = document.getElementById('regenerateBtn');
 
-        // Champs
         const qrData = document.getElementById('qrData');
-        const dataType = document.getElementById('dataType');
         const bgColor = document.getElementById('bgColor');
         const fillColor = document.getElementById('fillColor');
         const boxSize = document.getElementById('boxSize');
         const borderSize = document.getElementById('borderSize');
         const errorCorrection = document.getElementById('errorCorrection');
-        const qrVersion = document.getElementById('qrVersion');
         const textOverlay = document.getElementById('textOverlay');
-        const styleSelect = document.getElementById('styleSelect');
         const logoUpload = document.getElementById('logoUpload');
         const fileDropArea = document.getElementById('fileDropArea');
         const fileLabelText = document.getElementById('fileLabelText');
@@ -747,7 +802,6 @@
         const loader = document.getElementById('loader');
         const previewData = document.getElementById('previewData');
         const previewSize = document.getElementById('previewSize');
-        const previewVersion = document.getElementById('previewVersion');
         const previewCorrection = document.getElementById('previewCorrection');
         const downloadBtn = document.getElementById('downloadBtn');
         const copyBtn = document.getElementById('copyBtn');
@@ -760,24 +814,32 @@
         let currentStep = 1;
         let currentQRUrl = null;
         let logoFile = null;
-        let isGenerating = false;
 
-        // --- FONCTIONS ---
+        // --- MESSAGES ASSISTANT (communication améliorée) ---
+        const messages = {
+            1: "Donnez-moi le texte ou le lien à encoder.",
+            2: "Personnalisez les couleurs et la taille. Ajoutez un logo si vous voulez.",
+            3: "Votre QR est prêt ! Téléchargez-le ou copiez-le en un clic."
+        };
+
+        function updateAssistant(step) {
+            assistantText.textContent = messages[step] || messages[1];
+        }
+
+        // --- UTILITAIRES ---
         function showToast(message, type = 'success') {
             toastMsg.textContent = message;
             toast.className = 'toast';
-            if (type === 'success') toast.classList.add('toast-success');
-            else toast.classList.add('toast-error');
+            toast.classList.add(type === 'success' ? 'toast-success' : 'toast-error');
             toast.classList.add('show');
             clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => toast.classList.remove('show'), 3200);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         function showAlert(message, type = 'error') {
             alertBox.textContent = message;
             alertBox.className = 'alert';
-            if (type === 'success') alertBox.classList.add('alert-success');
-            else alertBox.classList.add('alert-error');
+            alertBox.classList.add(type === 'success' ? 'alert-success' : 'alert-error');
             clearTimeout(alertBox._timer);
             alertBox._timer = setTimeout(() => { alertBox.className = 'alert'; }, 5000);
         }
@@ -790,23 +852,32 @@
             else if (len > 1200) charCounter.classList.add('warning');
         }
 
-        // --- NAVIGATION ÉTAPES ---
+        // --- NAVIGATION ---
         function goToStep(step) {
             if (step < 1 || step > 3) return;
             currentStep = step;
-            // Mettre à jour les boutons du stepper
             steps.forEach((btn, idx) => {
                 const num = idx + 1;
                 btn.classList.remove('active', 'done');
                 if (num === step) btn.classList.add('active');
                 else if (num < step) btn.classList.add('done');
+                if (num < step) {
+                    btn.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+                } else {
+                    btn.querySelector('.step-circle').textContent = num;
+                }
+                if (num === 3 && num === step) {
+                    btn.querySelector('.step-circle').innerHTML = '<i class="fas fa-download"></i>';
+                } else if (num === 3 && num < step) {
+                    btn.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+                } else if (num === 3 && num > step) {
+                    btn.querySelector('.step-circle').textContent = '3';
+                }
             });
-            // Panels
             Object.keys(panels).forEach(key => {
                 panels[key].classList.toggle('active', parseInt(key) === step);
             });
-            stepBadge.textContent = `Étape ${step} / 3`;
-            // Si on va à l'étape 3, on génère si besoin
+            updateAssistant(step);
             if (step === 3 && !currentQRUrl) {
                 generateQR(true);
             }
@@ -824,18 +895,16 @@
             q.set('margin', params.border);
             q.set('qzone', '2');
             q.set('ecc', params.errorCorrection);
-            if (params.version !== 'auto') q.set('version', params.version);
             return base + '?' + q.toString();
         }
 
         function generateQR(silent = false) {
             const data = qrData.value.trim();
             if (!data) {
-                if (!silent) showAlert('Veuillez entrer des données.', 'error');
+                if (!silent) showAlert('Entrez des données d\'abord.', 'error');
                 return;
             }
 
-            isGenerating = true;
             loader.classList.add('show');
             qrImage.style.display = 'none';
 
@@ -846,9 +915,6 @@
                 boxSize: parseInt(boxSize.value) || 10,
                 border: parseInt(borderSize.value) || 4,
                 errorCorrection: errorCorrection.value,
-                version: qrVersion.value,
-                text: textOverlay.value,
-                style: styleSelect.value,
             };
 
             setTimeout(() => {
@@ -858,18 +924,16 @@
                     qrImage.alt = 'QR Code';
                     currentQRUrl = url;
 
-                    previewData.textContent = data.length > 40 ? data.slice(0, 38) + '…' : data;
+                    previewData.textContent = data.length > 38 ? data.slice(0, 35) + '…' : data;
                     previewSize.textContent = `${params.boxSize * 20}×${params.boxSize * 20} px`;
-                    previewVersion.textContent = params.version === 'auto' ? 'Auto' : `v${params.version}`;
                     previewCorrection.textContent = params.errorCorrection;
 
-                    if (!silent) showToast('QR Code généré', 'success');
+                    if (!silent) showToast('QR prêt !', 'success');
                 } catch (e) {
                     if (!silent) showAlert('Erreur : ' + e.message, 'error');
                 } finally {
                     loader.classList.remove('show');
                     qrImage.style.display = 'block';
-                    isGenerating = false;
                 }
             }, 500);
         }
@@ -877,7 +941,7 @@
         // --- TÉLÉCHARGER ---
         function downloadQR() {
             if (!currentQRUrl) {
-                showAlert('Générez d\'abord un QR code.', 'error');
+                showAlert('Générez d\'abord un QR.', 'error');
                 return;
             }
             const link = document.createElement('a');
@@ -886,13 +950,13 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('Téléchargement démarré', 'success');
+            showToast('Téléchargé ✅', 'success');
         }
 
-        // --- COPIER BASE64 ---
+        // --- COPIER ---
         async function copyQR() {
             if (!currentQRUrl) {
-                showAlert('Générez d\'abord un QR code.', 'error');
+                showAlert('Générez d\'abord un QR.', 'error');
                 return;
             }
             try {
@@ -942,46 +1006,34 @@
         }
 
         // --- ÉVÉNEMENTS ---
-        // Stepper
         steps.forEach((btn) => {
             btn.addEventListener('click', function() {
                 const step = parseInt(this.dataset.step);
-                if (step === 3 && !currentQRUrl) {
-                    generateQR(true);
-                }
+                if (step === 3 && !currentQRUrl) generateQR(true);
                 goToStep(step);
             });
         });
 
-        // Navigation
         toStep1.addEventListener('click', () => goToStep(1));
         toStep2.addEventListener('click', () => goToStep(2));
-        toStep2From1.addEventListener('click', () => goToStep(2));
 
         generateAndGoStep3.addEventListener('click', function() {
-            const data = qrData.value.trim();
-            if (!data) {
-                showAlert('Veuillez entrer des données.', 'error');
+            if (!qrData.value.trim()) {
+                showAlert('Entrez des données.', 'error');
                 return;
             }
             generateQR(false);
             goToStep(3);
         });
 
-        regenerateBtn.addEventListener('click', function() {
-            generateQR(false);
-        });
-
-        // Télécharger / Copier
+        regenerateBtn.addEventListener('click', () => generateQR(false));
         downloadBtn.addEventListener('click', downloadQR);
         copyBtn.addEventListener('click', copyQR);
 
-        // Compteur
         qrData.addEventListener('input', function() {
             updateCharCounter(this.value);
         });
 
-        // Logo
         logoUpload.addEventListener('change', function(e) {
             if (this.files && this.files[0]) handleLogoFile(this.files[0]);
         });
@@ -1000,21 +1052,18 @@
             e.preventDefault();
             this.style.borderColor = '#cbd8ea';
             this.style.background = '#f8faff';
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                logoUpload.files = files;
-                handleLogoFile(files[0]);
+            if (e.dataTransfer.files.length > 0) {
+                logoUpload.files = e.dataTransfer.files;
+                handleLogoFile(e.dataTransfer.files[0]);
             }
         });
         removeLogoBtn.addEventListener('click', removeLogo);
 
-        // Raccourci Ctrl+Enter depuis étape 1 ou 2
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
                 if (currentStep === 1 || currentStep === 2) {
-                    const data = qrData.value.trim();
-                    if (!data) { showAlert('Entrez des données.', 'error'); return; }
+                    if (!qrData.value.trim()) { showAlert('Entrez des données.', 'error'); return; }
                     generateQR(false);
                     goToStep(3);
                 }
@@ -1023,11 +1072,14 @@
 
         // --- INIT ---
         updateCharCounter(qrData.value);
-        // Génération auto à l'étape 1 (pour préremplir)
-        setTimeout(() => {
-            generateQR(true);
-        }, 300);
+        updateAssistant(1);
+        setTimeout(() => generateQR(true), 300);
         goToStep(1);
+
+        // Petite animation supplémentaire sur les étapes
+        document.querySelectorAll('.step-item').forEach((el, i) => {
+            el.style.transitionDelay = `${i * 0.05}s`;
+        });
 
     })();
 </script>
